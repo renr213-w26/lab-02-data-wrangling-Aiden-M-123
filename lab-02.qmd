@@ -1,6 +1,6 @@
 ---
 title: "Lab 2 - Data wrangling"
-author: "John Q. Student"
+author: "Aiden Mansfield"
 date: "June 24, 1497"
 format: 
   html: default # for speed
