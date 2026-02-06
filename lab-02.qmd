@@ -101,9 +101,59 @@ The distribution of population density of counties is unimodal and extremely rig
 
 ### Question 5
 
+```{r}
+midwest |>
+  mutate(metro = if_else(inmetro == 1, "Yes", "No")) |>
+  group_by(state) |>
+  summarize(portion_urban = mean(metro == "Yes"),
+            portion_not_urban = mean(metro == "No"))
+```
+
+
 \newpage
 
 ### Question 6
+
+```{r}
+#a
+midwest |>
+  select(county, state, percbelowpoverty, percollege) |>
+  filter(percbelowpoverty > 45, percbelowpoverty < 50, percollege < 10)
+
+#b
+midwest |>
+  select(county, state, percbelowpoverty, percollege) |>
+  filter(percollege > 40)
+
+#c
+midwest |>
+    select(county, state, percbelowpoverty, percollege) |>
+    filter(
+      (percbelowpoverty > 45 & percbelowpoverty < 50 & percollege < 10) |
+        (percollege > 40)
+    )
+
+#d
+midwest_mutated <- midwest |> #needed for part e
+  mutate(potential_outlier = if_else(
+    (percbelowpoverty > 45 & percbelowpoverty < 50 & percollege < 10) |
+        (percollege > 40), "Yes", "No"
+  ))|>
+  select(county, state, percbelowpoverty, percollege, potential_outlier) |>
+  arrange(potential_outlier)
+
+#e
+ggplot(midwest_mutated, aes(x=percollege, y=percbelowpoverty, colour=potential_outlier, shape=state)) + geom_point() +
+  labs(
+    title= "Percentage with a college degree versus povoerty rate\nby State in the Midwest",
+    x= "% college educated",
+    y= "% below poverty",
+    colour= "Potential Outlier",
+    shape= "State"
+
+  )
+```
+
 
 \newpage
 
