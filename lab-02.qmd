@@ -57,6 +57,15 @@ print(lowest)
 
 ### Question 2
 
+```{r}
+midwest |>
+  group_by(county) |>
+  summarise(county_repeat = n_distinct(state)) |>
+  filter(county_repeat == max(county_repeat)) |>
+  select(county, county_repeat)
+```
+
+
 \newpage
 
 ### Question 3
