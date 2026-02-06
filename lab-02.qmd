@@ -23,6 +23,35 @@ library(tidyverse)
 
 ### Question 1
 
+```{r}
+
+library(dplyr)
+
+state_count <- midwest |> 
+  group_by(state) |> 
+  summarize(county_numbers = n()) |> 
+  arrange(desc(county_numbers))
+print("Number of counties in each state in descending order of number of counties")
+print(state_count)
+
+highest <- midwest |> 
+  group_by(state) |> 
+  summarize(county_numbers = n()) |> 
+  ungroup() |> 
+  slice_max(county_numbers, n = 1)
+print("Highest number of counties")
+print(highest)
+
+lowest <- midwest |> 
+  group_by(state) |> 
+  summarize(county_numbers = n()) |> 
+  ungroup() |> 
+  slice_min(county_numbers, n = 1)
+print("Lowest number of counties")
+print(lowest)
+
+```
+
 
 \newpage
 
