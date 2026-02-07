@@ -159,9 +159,30 @@ ggplot(midwest_mutated, aes(x=percollege, y=percbelowpoverty, colour=potential_o
 
 ### Question 7
 
+```{r}
+#a
+state_population <- midwest |>
+  group_by(state) |>
+  summarize(total_population = sum(poptotal)) |>
+  arrange(desc(total_population))
+
+#b
+state_population |>
+  mutate(population_proportion = total_population / sum(total_population)) |>
+  arrange(desc(population_proportion))
+
+```
+c.
+Illinois is most populous with 27.2% of the Midwest living there.
+
 \newpage
 
 ### Question 8
+
+```{r}
+
+```
+
 
 \newpage
 
