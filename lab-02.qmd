@@ -197,3 +197,57 @@ Indiana has the lowest average percentage below poverty across its counties. Mic
 
 ### Question 9
 
+```{r}
+df <- tibble(
+  var_1 = c(10, 20, 30, 40, 50),
+  var_2 = c("Pizza", "Burger", "Pizza", "Pizza", "Burger"),
+  var_3 = c("Apple", "Apple", "Pear", "Pear", "Banana")
+)
+
+df
+
+#a
+df |>
+  arrange(var_2)
+
+#b
+df |>
+  group_by(var_2)
+
+#c
+df |>
+  group_by(var_2) |>
+  summarize(mean_var_1 = mean(var_1))
+
+#d
+df |>
+  group_by(var_2, var_3) |>
+  summarize(mean_var_1 = mean(var_1))
+
+#e
+df |>
+  group_by(var_2, var_3) |>
+  summarize(mean_var_1 = mean(var_1), .groups = "drop")
+
+#f
+df |>
+  group_by(var_2, var_3) |>
+  summarize(mean_var_1 = mean(var_1), .groups = "drop")
+
+df |>
+  group_by(var_2, var_3) |>
+  mutate(mean_var_1 = mean(var_1))
+```
+a.
+The rows are sorted alphabetically by var_2
+
+b.
+The row order was not changed but the observations are grouped which will affect how future operations are performed within each group.
+c.
+Observations are grouped by var_2 and the mean of var_1 is calculated for each group.
+d.
+Observations are grouped by both var_2 and var_3 then the mean of var_1 is computed for each group. The message indicates that output is grouped by var_2.
+e.
+Observations are grouped by both var_2 and var_3 then the mean of var_1 is computed for each group. Unlike in question d, the groupings are removed in the output.
+f.
+Summarize() is taking the groups of rows and putting them into a single row with summary values. Mutate() is keeping the original rows but adding a new column with a value calculated for the group.
