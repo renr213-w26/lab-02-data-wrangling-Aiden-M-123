@@ -1,6 +1,6 @@
 ---
 title: "Lab 2 - Data wrangling"
-author: "John Q. Student"
+author: "Aiden Mansfield"
 date: "June 24, 1497"
 format: 
   html: default # for speed
@@ -23,29 +23,172 @@ library(tidyverse)
 
 ### Question 1
 
+```{r}
+
+library(dplyr)
+
+state_count <- midwest |> 
+  group_by(state) |> 
+  summarize(county_numbers = n()) |> 
+  arrange(desc(county_numbers))
+print("Number of counties in each state in descending order of number of counties")
+print(state_count)
+
+highest <- midwest |> 
+  group_by(state) |> 
+  summarize(county_numbers = n()) |> 
+  ungroup() |> 
+  slice_max(county_numbers, n = 1)
+print("Highest number of counties")
+print(highest)
+
+lowest <- midwest |> 
+  group_by(state) |> 
+  summarize(county_numbers = n()) |> 
+  ungroup() |> 
+  slice_min(county_numbers, n = 1)
+print("Lowest number of counties")
+print(lowest)
+
+```
+
 
 \newpage
 
 ### Question 2
 
+```{r}
+midwest |>
+  group_by(county) |>
+  summarise(county_repeat = n_distinct(state)) |>
+  filter(county_repeat == max(county_repeat)) |>
+  select(county, county_repeat)
+```
+
+
 \newpage
 
 ### Question 3
+
+```{r}
+#a
+midwest |>
+    filter(popdensity > 25000) |>
+    arrange(desc(popdensity)) |>
+    select(county, state, popdensity, poptotal, area)
+#b
+midwest |>
+    filter(popdensity == max(popdensity)) |>
+    select(county,state, popdensity, poptotal, area)
+```
+
+
+\newpage
+
+### Question 4
+
+```{r}
+midwest |>
+  summarize(
+      median_density = median(popdensity),
+      lower_quartile = quantile(popdensity, 0.25),
+      upper_quartile = quantile(popdensity, 0.75)
+  )
+```
+The distribution of population density of counties is unimodal and extremely right-skewed. A typical Midwestern county has population density of 1156.208 people per unit area. The middle 50% of the counties have population densities between 622.4074 and 2330 people per unit area.
+
 \newpage
 
 ### Question 5
+
+```{r}
+midwest |>
+  mutate(metro = if_else(inmetro == 1, "Yes", "No")) |>
+  group_by(state) |>
+  summarize(portion_urban = mean(metro == "Yes"),
+            portion_not_urban = mean(metro == "No"))
+```
+
 
 \newpage
 
 ### Question 6
 
+```{r}
+#a
+midwest |>
+  select(county, state, percbelowpoverty, percollege) |>
+  filter(percbelowpoverty > 45, percbelowpoverty < 50, percollege < 10)
+
+#b
+midwest |>
+  select(county, state, percbelowpoverty, percollege) |>
+  filter(percollege > 40)
+
+#c
+midwest |>
+    select(county, state, percbelowpoverty, percollege) |>
+    filter(
+      (percbelowpoverty > 45 & percbelowpoverty < 50 & percollege < 10) |
+        (percollege > 40)
+    )
+
+#d
+midwest_mutated <- midwest |> #needed for part e
+  mutate(potential_outlier = if_else(
+    (percbelowpoverty > 45 & percbelowpoverty < 50 & percollege < 10) |
+        (percollege > 40), "Yes", "No"
+  ))|>
+  select(county, state, percbelowpoverty, percollege, potential_outlier) |>
+  arrange(potential_outlier)
+
+#e
+ggplot(midwest_mutated, aes(x=percollege, y=percbelowpoverty, colour=potential_outlier, shape=state)) + geom_point() +
+  labs(
+    title= "Percentage with a college degree versus povoerty rate\nby State in the Midwest",
+    x= "% college educated",
+    y= "% below poverty",
+    colour= "Potential Outlier",
+    shape= "State"
+
+  )
+```
+
+
 \newpage
 
 ### Question 7
 
+```{r}
+#a
+state_population <- midwest |>
+  group_by(state) |>
+  summarize(total_population = sum(poptotal)) |>
+  arrange(desc(total_population))
+
+#b
+state_population |>
+  mutate(population_proportion = total_population / sum(total_population)) |>
+  arrange(desc(population_proportion))
+
+```
+c.
+Illinois is most populous with 27.2% of the Midwest living there.
+
 \newpage
 
 ### Question 8
+
+```{r}
+state_poverty <- midwest |>
+  group_by(state) |>
+  summarize(mean_percbelowpoverty = mean(percbelowpoverty))
+state_poverty
+
+state_poverty |>
+  arrange(mean_percbelowpoverty)
+```
+Indiana has the lowest average percentage below poverty across its counties. Michigan has the highest average percentage below poverty across its counties
 
 \newpage
 
@@ -54,3 +197,57 @@ library(tidyverse)
 
 ### Question 9
 
+```{r}
+df <- tibble(
+  var_1 = c(10, 20, 30, 40, 50),
+  var_2 = c("Pizza", "Burger", "Pizza", "Pizza", "Burger"),
+  var_3 = c("Apple", "Apple", "Pear", "Pear", "Banana")
+)
+
+df
+
+#a
+df |>
+  arrange(var_2)
+
+#b
+df |>
+  group_by(var_2)
+
+#c
+df |>
+  group_by(var_2) |>
+  summarize(mean_var_1 = mean(var_1))
+
+#d
+df |>
+  group_by(var_2, var_3) |>
+  summarize(mean_var_1 = mean(var_1))
+
+#e
+df |>
+  group_by(var_2, var_3) |>
+  summarize(mean_var_1 = mean(var_1), .groups = "drop")
+
+#f
+df |>
+  group_by(var_2, var_3) |>
+  summarize(mean_var_1 = mean(var_1), .groups = "drop")
+
+df |>
+  group_by(var_2, var_3) |>
+  mutate(mean_var_1 = mean(var_1))
+```
+a.
+The rows are sorted alphabetically by var_2
+
+b.
+The row order was not changed but the observations are grouped which will affect how future operations are performed within each group.
+c.
+Observations are grouped by var_2 and the mean of var_1 is calculated for each group.
+d.
+Observations are grouped by both var_2 and var_3 then the mean of var_1 is computed for each group. The message indicates that output is grouped by var_2.
+e.
+Observations are grouped by both var_2 and var_3 then the mean of var_1 is computed for each group. Unlike in question d, the groupings are removed in the output.
+f.
+Summarize() is taking the groups of rows and putting them into a single row with summary values. Mutate() is keeping the original rows but adding a new column with a value calculated for the group.
